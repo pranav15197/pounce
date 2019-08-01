@@ -1,0 +1,85 @@
+<!-- chat/templates/chat/index.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <title>Audience Screen</title>
+    <style>
+        .cell{
+            margin: 2px;
+            border: 1px black solid;
+            border-radius: 25px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div id="logo">
+        <img  src="{{logo}}" class="rounded mx-auto d-block">
+        </div>
+        <div id="answers">
+            <p id="question">
+            
+            </p>
+            <h2>Pounce Answers</h2>
+            <table class='table'>
+                <tr><td width="10%"><div class="cell">1</div></td><td id="ans1"></td></tr>
+                <tr><td width="10%"><div class="cell">2</div></td><td id="ans2"></td></tr>
+                <tr><td width="10%"><div class="cell">3</div></td><td id="ans3"></td></tr>
+                <tr><td width="10%"><div class="cell">4</div></td><td id="ans4"></td></tr>
+                <tr><td width="10%"><div class="cell">5</div></td><td id="ans5"></td></tr>
+                <tr><td width="10%"><div class="cell">6</div></td><td id="ans6"></td></tr>
+                <tr><td width="10%"><div class="cell">7</div></td><td id="ans7"></td></tr>
+                <tr><td width="10%"><div class="cell">8</div></td><td id="ans8"></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jquery.min.js'%}"></script>
+    <script src="{% static 'js/bootstrap.min.js'%}"></script>
+    <script>
+
+
+        var roomName = 'quiz';
+        var data = '';
+
+        $("#answers").hide();
+        $("#question").hide();
+        {% if show_question %}
+            $("#question").show();
+        {% endif %}
+
+        var chatSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/chat/' + roomName + '/');
+
+        chatSocket.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            console.log(data);
+            if(data.data.end){
+                var question = data.data['question'];
+                var answers = data.data['answers'];
+                $("#logo").hide();
+                $("#question").html(question);
+                for(var i=0; i<8; i++){
+                    $("#ans"+(i+1)).html(answers[i]);
+                }
+                $("#answers").show();
+            }
+            if(data.data.clear){
+                $("#answers").hide();
+                $("#logo").show();
+            }
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        
+</script>
+</body>
+</html>

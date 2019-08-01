@@ -135,3 +135,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+SHOW_QUESTION_TO_AUDIENCE = False
+LOGO = "https://via.placeholder.com/350"

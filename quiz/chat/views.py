@@ -1,10 +1,17 @@
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
+from django.conf import settings
 import json
 
 
 def index(request):
     return render(request, 'chat/index.html', {})
+
+def audience(request):
+    return render(request, 'chat/audience.html', {
+        "logo": settings.LOGO,
+        "show_question": settings.SHOW_QUESTION_TO_AUDIENCE
+    })
 
 def room(request, room_name):
     return render(request, 'chat/room.html', {

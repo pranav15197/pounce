@@ -65,6 +65,13 @@
     <script src="{% static 'js/bootstrap.min.js'%}"></script>
     <script>
 
+        function get_answers(){
+            ans = [];
+            for(var i=0; i<8; i++){
+                ans.push($('#ans'+(i+1)).html())
+            }
+            return ans
+        }
         function start(){
             chatSocket.send(JSON.stringify({
                 'question': $("textarea").val(),
@@ -74,11 +81,16 @@
         function end(){
             chatSocket.send(JSON.stringify({
                 'end': true,
+                'question': $("textarea").val(),
+                'answers': get_answers()
             }));
         }
 
         function cls(){
-            $("textarea").val("Enter Your Question Here and click start...."),
+            $("textarea").val("Enter Your Question Here and click start....")
+            for(var i=0; i<8; i++){
+                $("#ans"+(i+1)).html('');
+            }
             chatSocket.send(JSON.stringify({
                 'clear': true,
             }));
