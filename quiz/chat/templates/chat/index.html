@@ -1,27 +1,122 @@
 <!-- chat/templates/chat/index.html -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <title>Chat Rooms</title>
+    <style>
+        .cell{
+            margin: 2px;
+            border: 1px black solid;
+            border-radius: 25px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    What chat room would you like to enter?<br/>
-    <input id="room-name-input" type="text" size="100"/><br/>
-    <input id="room-name-submit" type="button" value="Enter"/>
+    <div class="container mt-4" >
+        <div class="d-flex">
+            <div class="p-2 flex-grow-1"><h2>Question: </h2></div>
+            <div>
+                <button class="btn btn-primary" onclick="console.log('clicker');cls()">Clear</button>
+            </div>
+            <div class="ml-2">
+                <button class="btn btn-success" onclick="start()">Start</button>
+            </div>
+            <div class="ml-2">
+                <button class="btn btn-danger" onclick="end()">End</button>
+            </div>
+        </div>
+        <textarea data-autoresize class="form-control mb-4" style='background:rgba(0,0,0,0);resize:None' rows=4>Enter Your Question Here and click start....
+        </textarea>
+        
+        <h2>Answers: </h2>
+        <table class="table">
+            <tr>
+                <td width="10%"><div class='cell'>1</div></td>
+                <td width="40%" id='ans1' ></td>
+                <td width="10%"><div class='cell'>2</div></td>
+                <td width="40%" id='ans2' ></td>
+            </tr>
+            <tr>
+                <td width="10%"><div class='cell'>3</div></td>
+                <td width="40%"  id='ans3' ></td>
+                <td width="10%"><div  class='cell'>4</div></td>
+                <td width="40%" id='ans4'></td>
+            </tr>
+            <tr>
+                <td width="10%"><div  class='cell'>5</div></td>
+                <td width="40%" id='ans5' ></td>
+                <td width="10%"><div class='cell'>6</div></td>
+                <td width="40%" id='ans6'></td>
+            </tr>
+            <tr>
+                <td width="10%"><div  class='cell'>7</div></td>
+                <td width="40%" id='ans7'></td>
+                <td width="10%"><div class='cell'>8</div></td>
+                <td width="40%" id='ans8' ></td>
+            </tr>
+        </table>
+    </div>
 
+    <script src="{% static 'js/jquery.min.js'%}"></script>
+    <script src="{% static 'js/bootstrap.min.js'%}"></script>
     <script>
-        document.querySelector('#room-name-input').focus();
-        document.querySelector('#room-name-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {  // enter, return
-                document.querySelector('#room-name-submit').click();
-            }
+
+        function start(){
+            chatSocket.send(JSON.stringify({
+                'question': $("textarea").val(),
+            }));
+        }
+
+        function end(){
+            chatSocket.send(JSON.stringify({
+                'end': true,
+            }));
+        }
+
+        function cls(){
+            $("textarea").val("Enter Your Question Here and click start...."),
+            chatSocket.send(JSON.stringify({
+                'clear': true,
+            }));
+        }
+
+
+        var roomName = 'quiz';
+        var data = '';
+
+        var chatSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/chat/' + roomName + '/');
+
+        chatSocket.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            var message = data.data['message'];
+            console.log("#ans"+data['player']);
+            console.log(message);
+            $("#ans"+data.data['player']).html(message);
         };
 
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName + '/';
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
         };
-    </script>
+
+        function addAutoResize() {
+            document.querySelectorAll('[data-autoresize]').forEach(function (element) {
+                element.style.boxSizing = 'border-box';
+                var offset = element.offsetHeight - element.clientHeight;
+                document.addEventListener('input', function (event) {
+                event.target.style.height = 'auto';
+                event.target.style.height = event.target.scrollHeight + offset + 'px';
+                });
+                element.removeAttribute('data-autoresize');
+            });
+        }
+
+        
+</script>
 </body>
 </html>

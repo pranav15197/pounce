@@ -121,6 +121,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
 ASGI_APPLICATION = 'quiz.routing.application'
 
 CHANNEL_LAYERS = {
